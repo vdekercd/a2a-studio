@@ -15,8 +15,6 @@ This web app is in preview. Some features are missing and bugs may be found. For
 - 📋 **Task Management**: Visual task cards showing agent task execution
 - 🎨 **Dark/Light Theme**: Toggle between dark and light modes
 - 📱 **Responsive Design**: Works on desktop and mobile devices
-- 🔒 **Secure**: No secrets or sensitive data stored locally
-
 ## Getting Started
 
 ### Prerequisites
@@ -120,10 +118,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Links
 
 - [A2A Protocol Specification](https://a2a-protocol.org/latest/specification/)
-- [Live Demo](https://gentle-tree-08736b303.4.azurestaticapps.net/)
+- [Live Demo](https://a2astudio.net/)
 - [Report Issues](https://github.com/vdekercd/a2a-studio/issues)
 
 ## Acknowledgments
 
 - Built with the [A2A Protocol](https://a2a-protocol.org/) for agent-to-agent communication
-- UI inspired by modern design systems and Tesla OS aesthetics

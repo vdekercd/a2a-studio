@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoAgent", "Samples\EchoAg
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{0462FC92-E968-4C3C-BB41-BA452DEB03D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherAgent", "WeatherAgent\WeatherAgent.csproj", "{AFD3800D-8937-4749-AB16-CD46FEAA32E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherAgent", "Samples\WeatherAgent\WeatherAgent.csproj", "{AFD3800D-8937-4749-AB16-CD46FEAA32E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
