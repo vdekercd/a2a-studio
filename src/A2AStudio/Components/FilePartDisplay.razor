@@ -1,0 +1,81 @@
+@using A2AStudio.Models
+
+<div class="file-part-display">
+    <div class="file-part-header">
+        <i class="fas fa-file"></i>
+        <span class="file-name">@FilePart.FileName</span>
+        @if (!string.IsNullOrEmpty(FilePart.MimeType))
+        {
+            <span class="file-mime-type">(@FilePart.MimeType)</span>
+        }
+        @if (HasFileBytes())
+        {
+            <span class="file-size">@FormatFileSize(FilePart.FileBytes!.Length)</span>
+        }
+        else if (HasFileUri())
+        {
+            <span class="file-type">(External)</span>
+        }
+    </div>
+
+    <div class="file-part-content">
+        @if (HasFileUri())
+        {
+            @if (IsImageSvg() || IsImageFile())
+            {
+                <div class="image-preview">
+                    <img src="@FilePart.FileUri" alt="@FilePart.FileName" class="preview-image" />
+                </div>
+            }
+            else
+            {
+                <div class="uri-file-info">
+                    <i class="fas fa-link"></i>
+                    <span>External file: @FilePart.FileName</span>
+                    <a href="@FilePart.FileUri" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt"></i> Open
+                    </a>
+                </div>
+            }
+        }
+        else if (HasFileBytes())
+        {
+            @if (IsImageSvg())
+            {
+                <div class="svg-preview">
+                    @((MarkupString)GetSvgContent())
+                </div>
+            }
+            else if (IsTextFile())
+            {
+                <div class="text-preview">
+                    <pre><code>@GetTextContent()</code></pre>
+                </div>
+            }
+            else if (IsImageFile())
+            {
+                <div class="image-preview">
+                    <img src="@GetImageDataUrl()" alt="@FilePart.FileName" class="preview-image" />
+                </div>
+            }
+            else
+            {
+                <div class="binary-file-info">
+                    <i class="fas fa-download"></i>
+                    <span>Binary file - @FormatFileSize(FilePart.FileBytes?.Length ?? 0)</span>
+                    <button class="btn btn-sm btn-outline-primary download-btn" @onclick="DownloadFile">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-file-content">
+                <i class="fas fa-file"></i>
+                <span>File: @FilePart.FileName (No content available)</span>
+            </div>
+        }
+    </div>
+</div>
+

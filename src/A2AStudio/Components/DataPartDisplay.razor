@@ -1,0 +1,55 @@
+@using A2AStudio.Models
+@using System.Text.Json
+
+<div class="data-part-display">
+    <div class="data-part-header">
+        <i class="fas fa-database"></i>
+        <span class="data-label">Structured Data</span>
+        <button class="btn btn-sm btn-link toggle-format-btn" @onclick="ToggleFormat">
+            @if (_showFormatted)
+            {
+                <i class="fas fa-compress"></i> <span>Compact</span>
+            }
+            else
+            {
+                <i class="fas fa-expand"></i> <span>Formatted</span>
+            }
+        </button>
+    </div>
+
+    <div class="data-part-content">
+        @if (HasValidJsonData())
+        {
+            <div class="json-display @(_showFormatted ? "formatted" : "compact")">
+                <pre><code class="json-content">@GetDisplayJson()</code></pre>
+            </div>
+            
+            @if (_showFormatted && GetDataSummary().Any())
+            {
+                <div class="data-summary">
+                    <h6><i class="fas fa-info-circle"></i> Data Summary</h6>
+                    <ul class="summary-list">
+                        @foreach (var item in GetDataSummary())
+                        {
+                            <li>
+                                <strong>@item.Key:</strong> @item.Value
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="invalid-data">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Unable to parse data content</span>
+                <details>
+                    <summary>Raw Content</summary>
+                    <pre>@DataPart.JsonData</pre>
+                </details>
+            </div>
+        }
+    </div>
+</div>
+

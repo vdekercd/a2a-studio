@@ -1,0 +1,46 @@
+@using A2AStudio.Models
+
+<div class="agent-card-compact">
+    <div class="agent-card-header-compact">
+        @if (!string.IsNullOrEmpty(Agent.ImageUrl))
+        {
+            <img src="@Agent.ImageUrl" alt="@Agent.Name" class="agent-avatar-compact" />
+        }
+        else
+        {
+            <div class="agent-avatar-placeholder-compact">
+                <span class="avatar-initials">@GetInitials(Agent.Name)</span>
+            </div>
+        }
+        
+        <div class="agent-info-compact">
+            <div class="agent-name-compact">@Agent.Name</div>
+            @if (!string.IsNullOrEmpty(Agent.Version))
+            {
+                <span class="agent-version-compact"><span>v</span>@Agent.Version</span>
+            }
+        </div>
+        
+        <div class="connection-status-compact">
+            <span class="status-indicator @(Agent.IsConnected ? "connected" : "disconnected")"></span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Agent.Description))
+    {
+        <div class="agent-description-compact">
+            @Agent.Description
+        </div>
+    }
+
+    @if (Agent.Capabilities.Any())
+    {
+        <div class="agent-capabilities-compact">
+            @foreach (var capability in Agent.Capabilities)
+            {
+                <span class="capability-tag-compact">@capability</span>
+            }
+        </div>
+    }
+</div>
+

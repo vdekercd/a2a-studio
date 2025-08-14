@@ -1,0 +1,53 @@
+name: Build Blazor WebAssembly
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: |
+        cd src
+        dotnet restore A2AStudio.sln
+        
+    - name: Build solution
+      run: |
+        cd src
+        dotnet build A2AStudio.sln --configuration Release --no-restore
+        
+    - name: Publish Blazor WebAssembly
+      run: |
+        cd src
+        dotnet publish A2AStudio/A2AStudio.csproj \
+          --configuration Release \
+          --output ../publish \
+          --no-build
+          
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: blazor-webassembly-app
+        path: publish/wwwroot
+        retention-days: 30
+        
+    - name: Display build output info
+      run: |
+        echo "Build completed successfully!"
+        echo "Blazor WebAssembly output location: publish/wwwroot"
+        echo "Files in output:"
+        ls -la publish/wwwroot/

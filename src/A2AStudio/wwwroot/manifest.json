@@ -1,0 +1,50 @@
+{
+    "name": "A2AStudio - Agent-to-Agent Communication Testing Platform",
+    "short_name": "A2AStudio",
+    "description": "A powerful web application for testing Agent-to-Agent (A2A) protocol communication with real-time messaging and task management.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#0a89f7",
+    "orientation": "any",
+    "scope": "/",
+    "lang": "en",
+    "categories": ["developer", "testing", "ai", "productivity"],
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshot.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "A2AStudio main interface showing agent connection and messaging"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Connect Agent",
+            "short_name": "Connect",
+            "description": "Quickly connect to an A2A agent",
+            "url": "/#connect",
+            "icons": [
+                {
+                    "src": "icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

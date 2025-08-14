@@ -1,0 +1,186 @@
+﻿@page "/"
+
+<PageTitle>A2AStudio</PageTitle>
+
+<!-- Theme Toggle Button -->
+<div class="theme-toggle-container" data-theme="@(_isDarkMode ? "dark" : "light")">
+    <span class="theme-label">Dark</span>
+    <button class="theme-toggle-btn" @onclick="ToggleTheme" title="Toggle Dark/Light Mode">
+        <i class="fas fa-moon theme-icon moon-icon"></i>
+        <i class="fas fa-sun theme-icon sun-icon"></i>
+    </button>
+    <span class="theme-label">Light</span>
+</div>
+
+<div class="app-layout" data-theme="@(_isDarkMode ? "dark" : "light")">
+    <!-- Left Column: Agent Connection & Card -->
+    <div class="left-column">
+        <div class="left-column-content">
+            <div class="hero-section">
+                <img src="logo.png" alt="A2AStudio Logo" class="app-logo" />
+                <h1 class="app-title">A2AStudio</h1>
+                <p class="app-subtitle">Test Agent-to-Agent communication</p>
+            </div>
+
+            <div class="connection-section">
+                <div class="input-group">
+                    <label for="agentUrl">Agent URL</label>
+                    <input id="agentUrl" type="url" @bind="_agentUrl" @bind:event="oninput" 
+                           placeholder="https://example.com/agent" class="url-input" 
+                           disabled="@_isConnecting" />
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" @onclick="ConnectToAgent" disabled="@(_isConnecting || string.IsNullOrWhiteSpace(_agentUrl))">
+                        @if (_isConnecting)
+                        {
+                            <span class="spinner"></span>
+                            <span>Connecting...</span>
+                        }
+                        else
+                        {
+                            <span>Connect</span>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="error-message">
+                    <strong>Error:</strong> @_errorMessage
+                </div>
+            }
+
+            @if (A2AService.IsConnected && A2AService.ConnectedAgent != null)
+            {
+                <AgentCard Agent="A2AService.ConnectedAgent" />
+            }
+        </div>
+
+        <!-- A2A Specification Button -->
+        <div class="specification-section">
+            <a href="https://a2a-protocol.org/latest/specification/" target="_blank" class="btn btn-secondary specification-btn">
+                <i class="fas fa-book"></i>
+                <span>A2A Specification</span>
+            </a>
+            
+            <!-- Buy Me a Coffee Button -->
+            <a href="https://buymeacoffee.com/damienvdk" target="_blank" class="btn btn-secondary coffee-btn">
+                <i class="fas fa-coffee"></i>
+                <span>Buy me a coffee</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Right Column: Conversation -->
+    <div class="right-column">
+        @if (A2AService.IsConnected && A2AService.ConnectedAgent != null)
+        {
+            <div class="conversation-container">
+                <div class="conversation-header">
+                    <h2 class="conversation-title">Conversation with @A2AService.ConnectedAgent.Name</h2>
+                </div>
+
+                @if (_messageHistory.Any())
+                {
+                    <div class="message-history-fullscreen">
+                        <div class="messages-fullscreen">
+                            @{
+                                var taskGroups = _messageHistory.Where(m => m.IsTask && !string.IsNullOrEmpty(m.TaskId)).GroupBy(m => m.TaskId).ToDictionary(g => g.Key!, g => g.ToList());
+                                var renderedTasks = new HashSet<string>();
+                            }
+                            
+                            @* Display messages chronologically, with task cards inserted at first task message *@
+                            @foreach (var msg in _messageHistory.OrderBy(m => m.Timestamp))
+                            {
+                                @if (msg.IsTask && !string.IsNullOrEmpty(msg.TaskId) && !renderedTasks.Contains(msg.TaskId))
+                                {
+                                    @* Render the task card at the position of the first task message *@
+                                    var taskMessages = taskGroups[msg.TaskId].OrderBy(m => m.Timestamp).ToList();
+                                    var latestTaskMessage = taskMessages.Last();
+                                    
+                                    <TaskCard TaskMessage="latestTaskMessage" TaskMessages="taskMessages" />
+                                    renderedTasks.Add(msg.TaskId);
+                                }
+                                else if (!msg.IsTask)
+                                {
+                                    @* Render regular messages *@
+                                    <div class="message @(msg.IsFromUser ? "user-message" : "agent-message")">
+                                        <div class="message-content">
+                                            <div class="message-text">@msg.Text</div>
+                                            <div class="message-time">@msg.Timestamp.ToString("HH:mm:ss")</div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-messages">
+                        <p>Start a conversation by typing a message below</p>
+                    </div>
+                }
+                
+                <!-- Preview Warning -->
+                <div class="preview-warning">
+                    <div class="warning-content">
+                        <i class="fas fa-exclamation-triangle warning-icon"></i>
+                        <div class="warning-text">
+                            <strong>Preview Version</strong>
+                            <p>This web app is in preview. Some features are missing and bugs may be found. 
+                            For any remarks or issues, please <a href="https://github.com/vdekercd/a2a-studio/issues" target="_blank" rel="noopener noreferrer">create an issue on GitHub</a>.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message-input-section">
+                    <div class="message-input-group-fullscreen">
+                        <div class="task-selection-section">
+                            <label for="taskSelect">Send to task:</label>
+                            <select id="taskSelect" @bind="_selectedTaskId" class="task-select" disabled="@_isSendingMessage">
+                                <option value="">No task (new conversation)</option>
+                                @foreach (var task in GetAvailableTasks())
+                                {
+                                    <option value="@task.TaskId">@task.TaskId - @task.TaskStatus</option>
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="message-input-row">
+                            <input id="messageInput" type="text" @bind="_messageText" @bind:event="oninput" 
+                                   @onkeypress="HandleKeyPress"
+                                   placeholder="Type your message here..." class="message-input-fullscreen" 
+                                   disabled="@_isSendingMessage" />
+                            
+                            <button class="btn btn-primary send-btn-fullscreen" @onclick="SendMessage" 
+                                    disabled="@(_isSendingMessage || string.IsNullOrWhiteSpace(_messageText) || !A2AService.IsConnected)">
+                                @if (_isSendingMessage)
+                                {
+                                    <span class="spinner"></span>
+                                    <span>Sending...</span>
+                                }
+                                else
+                                {
+                                    <span>Send</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="no-agent-connected">
+                <div class="no-agent-content">
+                    <h2>No Agent Connected</h2>
+                    <p>Connect to an agent using the panel on the left to start a conversation.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,56 @@
+@using A2AStudio.Components.Pages
+
+<div class="task-card">
+    <div class="task-header">
+        <div class="task-id">
+            <i class="fas fa-tasks"></i>
+            <span>Task: @TaskMessage.TaskId</span>
+        </div>
+        <div class="task-status @GetStatusClass()">
+            <i class="@GetStatusIcon()"></i>
+            <span>@TaskMessage.TaskStatus</span>
+        </div>
+    </div>
+    
+    <div class="task-conversation">
+        @foreach (var msg in TaskMessages.OrderBy(m => m.Timestamp))
+        {
+            <div class="task-message @(msg.IsFromUser ? "user-task-message" : "agent-task-message")">
+                <div class="task-message-content">
+                    <div class="task-message-text">
+                        @if (msg.Parts.Any())
+                        {
+                            @foreach (var part in msg.Parts)
+                            {
+                                @if (part.Type == "text")
+                                {
+                                    <div class="task-text-part">
+                                        @part.Text
+                                    </div>
+                                }
+                                else if (part.Type == "file")
+                                {
+                                    <div class="task-file-part">
+                                        <FilePartDisplay FilePart="part" />
+                                    </div>
+                                }
+                                else if (part.Type == "data")
+                                {
+                                    <div class="task-data-part">
+                                        <DataPartDisplay DataPart="part" />
+                                    </div>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            @msg.Text
+                        }
+                    </div>
+                    <div class="task-message-time">@msg.Timestamp.ToString("HH:mm:ss")</div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
