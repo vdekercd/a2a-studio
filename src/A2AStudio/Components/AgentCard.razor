@@ -23,6 +23,18 @@
         
         <div class="connection-status-compact">
             <span class="status-indicator @(Agent.IsConnected ? "connected" : "disconnected")"></span>
+            @if (Agent.HasValidationIssues)
+            {
+                <span class="validation-indicator @(Agent.IsValid ? "warning" : "error")" title="@GetValidationTooltip()">
+                    <i class="fas @(Agent.IsValid ? "fa-exclamation-triangle" : "fa-times-circle")"></i>
+                </span>
+            }
+            else if (Agent.ValidationResult != null)
+            {
+                <span class="validation-indicator valid" title="Agent card is valid">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+            }
         </div>
     </div>
 
@@ -30,6 +42,56 @@
     {
         <div class="agent-description-compact">
             @Agent.Description
+        </div>
+    }
+
+    @if (Agent.HasValidationIssues)
+    {
+        <div class="agent-validation-compact">
+            <div class="validation-header">
+                <i class="fas @(Agent.IsValid ? "fa-exclamation-triangle" : "fa-times-circle")"></i>
+                <span class="validation-title">
+                    @(Agent.IsValid ? "Validation Warnings" : "Validation Errors")
+                </span>
+                <button class="btn btn-link validation-toggle" @onclick="ToggleValidationDetails">
+                    <i class="fas @(showValidationDetails ? "fa-chevron-up" : "fa-chevron-down")"></i>
+                </button>
+            </div>
+            
+            @if (showValidationDetails && Agent.ValidationResult != null)
+            {
+                <div class="validation-details">
+                    @if (Agent.ValidationResult.Errors.Any())
+                    {
+                        <div class="validation-section">
+                            <h6 class="validation-section-title">
+                                <i class="fas fa-times-circle"></i> Errors
+                            </h6>
+                            <ul class="validation-list">
+                                @foreach (var error in Agent.ValidationResult.Errors)
+                                {
+                                    <li class="validation-error">@error</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    
+                    @if (Agent.ValidationResult.Warnings.Any())
+                    {
+                        <div class="validation-section">
+                            <h6 class="validation-section-title">
+                                <i class="fas fa-exclamation-triangle"></i> Warnings
+                            </h6>
+                            <ul class="validation-list">
+                                @foreach (var warning in Agent.ValidationResult.Warnings)
+                                {
+                                    <li class="validation-warning">@warning</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 

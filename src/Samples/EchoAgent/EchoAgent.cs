@@ -236,7 +236,13 @@ public class EchoAgent
             Capabilities = new AgentCapabilities() { 
                 Streaming = true
             },
-            Skills = []
+            Skills = [
+            new AgentSkill()
+            {
+                Name = "Echo",
+                Description = "Echoes back the input message"
+            }
+            ]
         };
     }
 }

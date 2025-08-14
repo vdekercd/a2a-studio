@@ -561,6 +561,146 @@ a:hover, .btn-link:hover {
     letter-spacing: 0.2px;
 }
 
+/* Agent Card Validation Styles */
+.validation-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    font-size: 8px;
+}
+
+.validation-indicator.valid {
+    background: var(--app-success);
+    color: white;
+}
+
+.validation-indicator.warning {
+    background: var(--app-warning);
+    color: white;
+}
+
+.validation-indicator.error {
+    background: var(--app-error);
+    color: white;
+}
+
+.agent-validation-compact {
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background: var(--app-card);
+    border-radius: 6px;
+    border: 1px solid var(--app-border);
+}
+
+.validation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.validation-header i {
+    font-size: 12px;
+}
+
+.validation-header .fa-exclamation-triangle {
+    color: var(--app-warning);
+}
+
+.validation-header .fa-times-circle {
+    color: var(--app-error);
+}
+
+.validation-title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--app-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.validation-toggle {
+    padding: 0;
+    min-width: auto;
+    font-size: 10px;
+    color: var(--app-text-secondary);
+    background: none;
+    border: none;
+}
+
+.validation-toggle:hover {
+    color: var(--app-accent);
+    background: none;
+    border: none;
+    transform: none;
+    box-shadow: none;
+}
+
+.validation-details {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--app-border);
+}
+
+.validation-section {
+    margin-bottom: 0.75rem;
+}
+
+.validation-section:last-child {
+    margin-bottom: 0;
+}
+
+.validation-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0 0 0.25rem 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+}
+
+.validation-section-title .fa-times-circle {
+    color: var(--app-error);
+}
+
+.validation-section-title .fa-exclamation-triangle {
+    color: var(--app-warning);
+}
+
+.validation-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.validation-list li {
+    font-size: 11px;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border-left: 3px solid;
+}
+
+.validation-error {
+    background: rgba(244, 67, 54, 0.1);
+    border-left-color: var(--app-error);
+    color: var(--app-text-primary);
+}
+
+.validation-warning {
+    background: rgba(255, 152, 0, 0.1);
+    border-left-color: var(--app-warning);
+    color: var(--app-text-primary);
+}
+
 /* Legacy App Agent Card (keep for backward compatibility) */
 .agent-card {
     background: var(--app-surface);

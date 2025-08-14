@@ -42,6 +42,9 @@ public class A2AService(ILogger<A2AService> logger) : IA2AService
             var cardResolver = new A2ACardResolver(uri);
             _agentCard = await cardResolver.GetAgentCardAsync();
 
+            // Validate the agent card
+            var validationResult = AgentCardValidator.ValidateAgentCard(_agentCard);
+            
             _connectedAgentInfo = new AgentCardInfo
             {
                 Name = _agentCard.Name,
@@ -50,9 +53,10 @@ public class A2AService(ILogger<A2AService> logger) : IA2AService
                 Url = _agentCard.Url,
                 ImageUrl = null,
                 Capabilities = ExtractCapabilities(_agentCard.Capabilities),
-                Tags = new List<string>(),
+                Tags = [],
                 LastUpdated = DateTime.UtcNow,
-                IsConnected = true
+                IsConnected = true,
+                ValidationResult = validationResult
             };
             
             _cachedClient = new A2AClient(new Uri(_agentCard.Url));
