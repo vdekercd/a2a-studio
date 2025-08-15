@@ -1468,6 +1468,35 @@ a:hover, .btn-link:hover {
     font-size: 1rem;
 }
 
+.github-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--app-card);
+    border: 1px solid var(--app-border);
+    color: var(--app-text-secondary);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.github-btn:hover {
+    background: #24292e;
+    color: #ffffff;
+    border-color: #24292e;
+    transform: translateY(-1px);
+    box-shadow: var(--app-shadow);
+}
+
+.github-btn i {
+    font-size: 1rem;
+}
+
 .task-conversation {
     padding: 1rem;
     display: flex;
