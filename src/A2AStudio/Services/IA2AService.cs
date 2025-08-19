@@ -8,6 +8,7 @@ public interface IA2AService
     Task<MessageResult> SendMessageAsync(string message, string? taskId, IEnumerable<string>? previousMessages);
     bool IsConnected { get; }
     AgentCardInfo? ConnectedAgent { get; }
+    string? GetAgentCardJson();
     void Disconnect();
 }
 

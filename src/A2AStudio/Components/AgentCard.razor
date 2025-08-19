@@ -1,5 +1,70 @@
 @using A2AStudio.Models
 
+<style>
+    /* JSON Syntax Highlighting - Dark Mode (Default) */
+    .json-display .json-string {
+        color: #7dd3fc;
+    }
+    
+    .json-display .json-number {
+        color: #60a5fa;
+        font-weight: 600;
+    }
+    
+    .json-display .json-boolean {
+        color: #fb7185;
+        font-weight: 600;
+    }
+    
+    .json-display .json-null {
+        color: #94a3b8;
+        font-style: italic;
+    }
+    
+    .json-display .json-punctuation {
+        color: #f97316;
+    }
+    
+    .json-display .json-brace {
+        color: #fbbf24;
+        font-weight: 600;
+    }
+    
+    .json-display .json-bracket {
+        color: #a78bfa;
+        font-weight: 600;
+    }
+    
+    /* Light theme overrides */
+    [data-theme="light"] .json-display .json-string {
+        color: #22863a;
+    }
+    
+    [data-theme="light"] .json-display .json-number {
+        color: #005cc5;
+    }
+    
+    [data-theme="light"] .json-display .json-boolean {
+        color: #d73a49;
+    }
+    
+    [data-theme="light"] .json-display .json-null {
+        color: #6a737d;
+    }
+    
+    [data-theme="light"] .json-display .json-punctuation {
+        color: #d73a49;
+    }
+    
+    [data-theme="light"] .json-display .json-brace {
+        color: #e36209;
+    }
+    
+    [data-theme="light"] .json-display .json-bracket {
+        color: #6f42c1;
+    }
+</style>
+
 <div class="agent-card-compact">
     <div class="agent-card-header-compact">
         @if (!string.IsNullOrEmpty(Agent.ImageUrl))
@@ -35,8 +100,36 @@
                     <i class="fas fa-check-circle"></i>
                 </span>
             }
+            @if (Agent.IsConnected)
+            {
+                <button class="btn btn-link btn-sm px-1 py-0 json-toggle" @onclick="ToggleJsonDetails" title="View JSON agent card" style="min-width: auto; line-height: 1;">
+                    <i class="fas fa-code" style="font-size: 10px;"></i>
+                </button>
+                @if (showJsonDetails)
+                {
+                    <button @onclick="ToggleJsonDetails" title="Hide JSON" style="width: 20px; height: 20px; border: 1px solid var(--app-border); background: var(--app-surface); border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; padding: 0; margin-left: 4px;" 
+                            onmouseover="this.style.background='#dc3545'; this.style.borderColor='#dc3545';" 
+                            onmouseout="this.style.background='var(--app-surface)'; this.style.borderColor='var(--app-border)';">
+                        <i class="fas fa-times" style="color: var(--app-text-primary); font-size: 8px;"></i>
+                    </button>
+                }
+            }
         </div>
     </div>
+
+    @if (Agent.IsConnected && showJsonDetails)
+    {
+        <div class="agent-json-below" style="margin-top: 0.75rem;">
+            @if (!string.IsNullOrEmpty(agentCardJson))
+            {
+                <pre class="json-display m-0 p-2" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--app-border); border-radius: 4px; font-size: 11px; background-color: var(--app-bg); color: var(--app-text-primary);"><code>@((MarkupString)FormatJsonWithSyntaxHighlighting(agentCardJson))</code></pre>
+            }
+            else
+            {
+                <p class="json-error text-muted small">Unable to load agent JSON data.</p>
+            }
+        </div>
+    }
 
     @if (!string.IsNullOrEmpty(Agent.Description))
     {
@@ -95,6 +188,7 @@
         </div>
     }
 
+
     @if (Agent.Capabilities.Any())
     {
         <div class="agent-capabilities-compact">
@@ -105,4 +199,5 @@
         </div>
     }
 </div>
+
 

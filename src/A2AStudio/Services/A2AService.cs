@@ -11,6 +11,26 @@ public class A2AService(ILogger<A2AService> logger) : IA2AService
     public bool IsConnected => _connectedAgentInfo != null && _agentCard != null && _cachedClient != null;
     public AgentCardInfo? ConnectedAgent => _connectedAgentInfo;
     
+    public string? GetAgentCardJson()
+    {
+        if (_agentCard == null)
+            return null;
+            
+        try
+        {
+            return JsonSerializer.Serialize(_agentCard, new JsonSerializerOptions 
+            { 
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to serialize agent card to JSON");
+            return null;
+        }
+    }
+    
     public void Disconnect()
     {
         _agentCard = null;

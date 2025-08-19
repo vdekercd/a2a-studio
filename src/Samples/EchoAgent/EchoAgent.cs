@@ -220,29 +220,20 @@ public class EchoAgent
 
     private async Task<AgentCard> GetAgentCardAsync(string agentUrl, CancellationToken cancellationToken)
     {
-        if (cancellationToken.IsCancellationRequested)
+        return await Task.FromResult<AgentCard>(new AgentCard()
         {
-            return await Task.FromCanceled<AgentCard>(cancellationToken);
-        }
-
-        return new AgentCard()
-        {
-            Name = "Echo Agent with Enhanced Tasks",
-            Description = "An A2A agent that echoes back messages and handles enhanced tasks. Messages return text only. Tasks return text + SVG visualization + JSON data analysis.",
-            Url = agentUrl,
-            Version = "1.2.0",
-            DefaultInputModes = ["text"],
-            DefaultOutputModes = ["text", "image/svg+xml", "application/json"],
-            Capabilities = new AgentCapabilities() { 
-                Streaming = true
-            },
-            Skills = [
-            new AgentSkill()
-            {
-                Name = "Echo",
-                Description = "Echoes back the input message"
-            }
+            Name = "Echo Agent Demo",
+            Description = "A simple demonstration agent that echoes back any message it receives",
+            Url = "http://localhost:5000/",
+            Capabilities = new AgentCapabilities() { Streaming = true },
+            Skills =
+            [
+                new AgentSkill
+                {
+                    Name = "Echo",
+                    Description = "Echoes back the received message"
+                }
             ]
-        };
+        });
     }
 }

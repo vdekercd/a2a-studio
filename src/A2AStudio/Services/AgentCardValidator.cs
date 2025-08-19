@@ -53,7 +53,7 @@ public static class AgentCardValidator
         // Version is required
         if (string.IsNullOrWhiteSpace(agentCard.Version))
         {
-            result.AddError("Agent URL is required");
+            result.AddError("Agent version is required");
         }
     }
     

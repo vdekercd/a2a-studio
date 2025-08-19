@@ -15,75 +15,44 @@ public class WeatherAgent(
     {
         _taskManager = taskManager;
         taskManager.OnAgentCardQuery = GetAgentCardAsync;
-        taskManager.OnTaskCreated = ProcessTaskCreatedAsync;
-        taskManager.OnTaskUpdated = ProcessUpdate;
+        taskManager.OnTaskCreated = ProcessTaskAsync;
+        taskManager.OnTaskUpdated = ProcessTaskAsync;
     }
 
-    private async Task ProcessUpdate(AgentTask agentTaskParams, CancellationToken cancellationToken)
+    private async Task ProcessTaskAsync(AgentTask agentTaskParams, CancellationToken cancellationToken)
     {
-        await ProcessTaskCreatedAsync(agentTaskParams, cancellationToken);
-    }
+        var lastMessage = agentTaskParams.History!.Last();
+        var messageText = lastMessage.Parts.OfType<TextPart>().First().Text;
 
-    private async Task ProcessTaskCreatedAsync(AgentTask agentTaskParams, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var lastMessage = agentTaskParams.History!.Last();
-            var messageText = lastMessage.Parts.OfType<TextPart>().First().Text;
+        var locationCheck = await locationDetectionService.CheckForLocationAsync(messageText, cancellationToken);
 
-            var responseText = await ProcessWeatherRequestAsync(messageText, cancellationToken);
-            
-            if (responseText.StartsWith("Please provide a location"))
-            {
-                await _taskManager!.UpdateStatusAsync(
-                    agentTaskParams.Id,
-                    TaskState.InputRequired,
-                    final: false,
-                    cancellationToken: cancellationToken);
-            }
-            else
-            {
-                await _taskManager!.UpdateStatusAsync(
-                    agentTaskParams.Id,
-                    TaskState.Completed,
-                    final: true,
-                    cancellationToken: cancellationToken);
-            }
-
-            await _taskManager!.ReturnArtifactAsync(agentTaskParams.Id, new Artifact
-            {
-                Parts = [new TextPart { Text = responseText }]
-            }, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            await _taskManager!.ReturnArtifactAsync(agentTaskParams.Id, new Artifact
-            {
-                Parts = [new TextPart { Text = $"Error processing weather request: {ex.Message}" }]
-            }, cancellationToken);
-            
-            await _taskManager!.UpdateStatusAsync(
-                agentTaskParams.Id,
-                TaskState.Failed,
-                final: true,
-                cancellationToken: cancellationToken);
-        }
-    }
-
-    private async Task<string> ProcessWeatherRequestAsync(string message, CancellationToken cancellationToken)
-    {
-        var locationCheck = await locationDetectionService.CheckForLocationAsync(message, cancellationToken);
-        
         if (!locationCheck.HasLocation)
         {
-            return "Please provide a location to get the weather information. For example: 'What's the weather in New York?' or 'How's the weather in London today?'";
+            await _taskManager!.UpdateStatusAsync(
+                agentTaskParams.Id,
+                TaskState.InputRequired,
+                final: false,
+                cancellationToken: cancellationToken);
+
+            await _taskManager!.ReturnArtifactAsync(agentTaskParams.Id, new Artifact
+            {
+                Parts =
+                [
+                    new TextPart
+                    {
+                        Text =
+                            "Please provide a location to get the weather information. For example: 'What's the weather in New York?' or 'How's the weather in London today?'"
+                    }
+                ]
+            }, cancellationToken);
+
+            return;
         }
 
-        // Create chat messages for weather request
         var messages = new List<ChatMessage>
         {
             new(ChatRole.System, "You are a helpful weather assistant. Use the GetWeatherAsync function to provide weather information for the requested location."),
-            new(ChatRole.User, message)
+            new(ChatRole.User, messageText)
         };
 
         // Define the weather function using AIFunctionFactory
@@ -101,7 +70,16 @@ public class WeatherAgent(
         // Get response from chat client with automatic function calling
         var response = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
         
-        return response.Text ?? "Unable to retrieve weather information.";
+        await _taskManager!.UpdateStatusAsync(
+            agentTaskParams.Id,
+            TaskState.Completed,
+            final: true,
+            cancellationToken: cancellationToken);
+    
+        await _taskManager!.ReturnArtifactAsync(agentTaskParams.Id, new Artifact
+        {
+            Parts = [new TextPart { Text = response.Text }]
+        }, cancellationToken);
     }
     
     private async Task<AgentCard> GetAgentCardAsync(string agentUrl, CancellationToken cancellationToken)
@@ -111,6 +89,7 @@ public class WeatherAgent(
             Name = "Weather Agent",
             Description = "An intelligent weather agent powered by Microsoft.Extensions.AI that provides weather information for any location",
             Url = agentUrl,
+            Version = "1.0.0",
             Capabilities = new AgentCapabilities { Streaming = true },
             Skills =
             [
