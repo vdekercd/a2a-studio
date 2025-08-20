@@ -54,20 +54,13 @@ public class WeatherAgent(
             new(ChatRole.System, "You are a helpful weather assistant. Use the GetWeatherAsync function to provide weather information for the requested location."),
             new(ChatRole.User, messageText)
         };
-
-        // Define the weather function using AIFunctionFactory
-        var weatherFunction = AIFunctionFactory.Create(weatherService.GetWeatherAsync);
-
-        // Configure chat options with function calling
+        
         var chatOptions = new ChatOptions
         {
-            Tools = [weatherFunction],
-            ToolMode = ChatToolMode.Auto,
-            Temperature = 0.7f,
-            MaxOutputTokens = 500
+            Tools = [AIFunctionFactory.Create(weatherService.GetWeatherAsync)],
+            ToolMode = ChatToolMode.Auto
         };
-
-        // Get response from chat client with automatic function calling
+        
         var response = await chatClient.GetResponseAsync(messages, chatOptions, cancellationToken);
         
         await _taskManager!.UpdateStatusAsync(
